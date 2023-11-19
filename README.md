@@ -21,4 +21,6 @@ Will start the application, served on `http://127.0.0.1:8000`
 
 ## Open API
 
-While the server is running, browse `http://127.0.0.1:8000/docs` to get the API documentation.
+To get the API documentation, while the server is running, browse one of these url:
+- `http://127.0.0.1:8000/redoc` (redoc)
+- `http://127.0.0.1:8000/docs` (swagger)
