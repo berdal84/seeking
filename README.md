@@ -19,7 +19,7 @@ uvicorn main:app --reload
 
 Will start the application, served on `http://127.0.0.1:8000`
 
-## Open API
+## Documentation
 
 To get the API documentation, while the server is running, browse one of these url:
 - `http://127.0.0.1:8000/redoc` (redoc)
