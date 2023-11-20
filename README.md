@@ -30,6 +30,17 @@ Run the script below
 pip install -r requirements.txt
 ```
 
+### Environment
+
+Set up the following environment variables
+
+```
+DATABASE_NAME=seeking
+DATABASE_SERVER=127.0.0.1
+DATABASE_USER=postgress
+DATABASE_PASSWORD=<your-postgres-password>
+```
+
 ## Run app
 
 Prerequisites: see install section
