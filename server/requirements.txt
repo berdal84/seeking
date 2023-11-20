@@ -1,6 +1,6 @@
 fastapi~=0.104
 uvicorn~=0.24
 SQLAlchemy~=2.0.23
-starlette~=0.32.0
+starlette~=0.27.0
 pydantic~=2.5.1
 postgres~=4.0
