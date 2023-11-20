@@ -3,6 +3,27 @@ Tiny app to practice Python and FastAPI.
 
 ## Install
 
+### Prerequisites (do once):
+
+This project is developed using a GNU/Linux distribution.
+Make sure [python 3.12](https://www.makeuseof.com/install-python-ubuntu/) is installed
+
+Install postgres ([documentation](https://www.postgresql.org/docs/current/tutorial-install.html))
+
+```
+sudo apt-get -y install postgresql
+``` 
+
+Set up the database with `psql`
+
+```
+sudo -u postgres psql
+postgres=# create database seeking;
+```
+A message `CREATE DATABASE` should confirm the creation of the db.
+
+### Install the requirements
+
 Run the script below
 
 ```shell

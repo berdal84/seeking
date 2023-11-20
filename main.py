@@ -1,75 +1,64 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.openapi.models import Response
+from fastapi import Depends, FastAPI, HTTPException
+from sqlalchemy.orm import Session
 from starlette import status
-from src.company import Company
-from src.body import Body
+from src.database import SessionLocal, engine
+from src import models, schemas, crud, guards, convert
+from src.schemas import Page
 
-app = FastAPI()
+models.Base.metadata.create_all(bind=engine)
 
-
-@app.get("/")
-async def root() -> Body:
-
-    """ Hello Word end point"""
-
-    return Body(message="Hello World")
+app = FastAPI(title="Seeking")
 
 
-@app.get("/company/")
-async def read_company_all(page: int = 0, limit: int = 10) -> Body:
-
-    """ Get all companies by page """
-
-    if page < 0:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f'page number must be between 0 and infinity (actual: {page}) ',
-        )
-
-    if limit < 1 or limit > 100:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f'limit number must be between 1 and 100 (actual: {page}) ',
-        )
-
-    results = []
-    range_start = page * limit
-    for item_id in range(range_start, range_start + limit):
-        results.append(Company(id=item_id))
-
-    return Body(
-        message="read_company_all is not implemented yet",
-        data=results
-    )
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
-@app.get("/company/{company_id}/")
-async def read_company(company_id: int) -> Body:
-
-    """ Get a company from a given id """
-
-    company = Company(id=company_id)
-
-    if company_id < 0:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f'company_id {company_id} should be a positive integer',
-        )
-
-    return Body(
-        message="read_company is not implemented yet",
-        data=company
-    )
+@app.post("/job/")
+async def create_job(job: schemas.JobCreate, session: Session = Depends(get_db)) -> schemas.Job:
+    db_job = crud.create_job(session, job)
+    return convert.job_model_to_schema(db_job)
 
 
-@app.post("/company/{company_id}/event/")
-async def create_event(company_id: int) -> Body:
+@app.get("/job/")
+async def get_job_page(page: int = 0, limit: int = 10, session: Session = Depends(get_db)) -> Page[schemas.Job]:
+    # Checks
+    guards.is_positive_int(page, "page")
+    guards.is_in_range_int(limit, 1, 100, "limit")
 
-    """ Get an event from a given id """
+    # Query DB
+    db_jobs = crud.get_job_page(session, skip=page * limit, limit=limit)
+    item_total_count = crud.get_job_count(session)  # TODO: get this in single request?
 
-    company = Company(id=company_id)
+    # Prepare response
+    response = Page[schemas.Job](page_index=page,
+                                 item=[],
+                                 item_total_count=item_total_count
+                                 )
+    for each_db_job in db_jobs:
+        response.item.append(convert.job_model_to_schema(each_db_job))
 
-    return Body(
-        message="create_event is not implemented yet",
-        data=company
-    )
+    return response
+
+
+@app.get("/job/{job_id}/")
+async def get_job(job_id: int, session: Session = Depends(get_db)) -> schemas.Job:
+    guards.is_positive_int(job_id, "job_id")
+    db_job = crud.get_job(session, job_id)
+
+    if db_job is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    return convert.job_model_to_schema(db_job)
+
+
+@app.post("/job/{job_id}/event/")
+async def create_event(event: schemas.EventCreate, job_id: int, session: Session = Depends(get_db)) -> schemas.Event:
+    guards.is_positive_int(job_id, "job_id")
+    db_event = crud.create_event(session, event, job_id)
+
+    return convert.event_model_to_schema(db_event)
