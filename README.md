@@ -6,7 +6,7 @@ Tiny app to practice Python and FastAPI.
 Run the script below
 
 ```shell
-pip install fastapi[standard] uvicorn[standard]
+pip install -r requirements.txt
 ```
 
 ## Run app
