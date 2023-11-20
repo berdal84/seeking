@@ -44,7 +44,7 @@ async def read_company_all(page: int = 0, limit: int = 10) -> Body:
 
 
 @app.get("/company/{company_id}/")
-async def read_company(company_id: int, response: Response) -> Body:
+async def read_company(company_id: int) -> Body:
 
     """ Get a company from a given id """
 
