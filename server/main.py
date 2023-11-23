@@ -62,3 +62,19 @@ async def create_event(event: schemas.EventCreate, job_id: int, session: Session
     db_event = crud.create_event(session, event, job_id)
 
     return convert.event_model_to_schema(db_event)
+
+
+@app.get("/event/{event_id}/")
+async def get_event(event_id: int, session: Session = Depends(get_db)) -> schemas.Event:
+    guards.is_positive_int(event_id, "event_id")
+    db_event = crud.get_event(session, event_id)
+
+    return convert.event_model_to_schema(db_event)
+
+
+@app.patch("/event/{event_id}/")
+async def update_event(event: schemas.EventUpdate, event_id: int, session: Session = Depends(get_db)) -> schemas.Event:
+    guards.is_positive_int(event_id, "event_id")
+    db_event = crud.update_event(session, event_id, event)
+
+    return convert.event_model_to_schema(db_event)

@@ -1,7 +1,7 @@
 import datetime
 from typing import Type, Optional
 
-from sqlalchemy import DateTime, Date
+from sqlalchemy import DateTime, Date, select
 from sqlalchemy.orm import Session
 from src import models, schemas
 
@@ -57,5 +57,22 @@ def create_event(session: Session,
 def get_event_count(session: Session) -> int:
     # No need for optimization right now
     return session.query(models.Event).count()
+
+
+def update_event(session: Session, event_id: int, event: schemas.EventUpdate) -> models.Event:
+    db_event: models.Event = session.query(models.Event).get(event_id)
+
+    if event.type is not None:
+        db_event.type = event.type
+
+    if event.date is not None:
+        db_event.date = event.date
+
+    if event.notes is not None:
+        db_event.notes = event.notes
+
+    session.commit()
+    session.refresh(db_event)
+    return db_event
 
 # ======================================================================================================================

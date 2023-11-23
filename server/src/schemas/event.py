@@ -1,7 +1,6 @@
 import datetime
-from dataclasses import dataclass
 from typing import Optional
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
 from enum import Enum
 
 
@@ -24,6 +23,15 @@ class EventType(str, Enum):
 class EventCreate(BaseModel):
     type: EventType
     notes: str
+
+
+class EventUpdate(BaseModel):
+    type: Optional[EventType] = None
+    date: Optional[datetime.date] = None
+    notes: Optional[str] = None
+
+    class Config:
+        use_enum_values = True
 
 
 class Event(BaseModel):
