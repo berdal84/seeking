@@ -1,14 +1,10 @@
-import JobTable from "@/app/job-table";
-import {Suspense} from "react";
+"use client"
+import Home from "@/app/components/home";
 
-export default async function Home() {
+export default function App() {
+
   return (
-    <main className="flex">
-      <Suspense>
-        <h1>Seeking</h1>
-        <JobTable/>
-      </Suspense>
-    </main>
+    <Home/>
   )
 }
 

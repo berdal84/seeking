@@ -1,11 +1,15 @@
-import {useMemo} from "react";
-import api from "@/app/api";
-import {schemas} from "@/app/schemas";
+"use client"
 
-export default async function JobTable() {
+import useJobs from "@/app/hooks/useJobs";
+import {Spinner} from "@/app/components/spinner";
 
-  const page: schemas.JobPage = await useMemo(() => api.getJobs(), [])
+export default function JobTable() {
 
+  const { data, error, isLoading } = useJobs()
+
+  if ( isLoading || !data) {
+    return <Spinner/>
+  }
   return <table className="table-auto">
     <thead>
       <tr>
@@ -19,7 +23,7 @@ export default async function JobTable() {
     </thead>
     <tbody>
     {
-      page.item.map( ({id, company, role, url, notes, events})  => (
+      data.item.map( ({id, company, role, url, notes, events})  => (
         <tr key={id}>
           <th>{id}</th>
           <th>{company}</th>
