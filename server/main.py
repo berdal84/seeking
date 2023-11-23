@@ -15,6 +15,8 @@ app = FastAPI(title="Seeking")
 origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://127.0.0.1",
+    "http://localhost",
 ]
 
 app.add_middleware(
@@ -24,6 +26,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 def get_db():
     db = SessionLocal()
