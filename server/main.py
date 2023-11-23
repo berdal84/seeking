@@ -27,7 +27,6 @@ async def create_job(job: schemas.JobCreate, session: Session = Depends(get_db))
 @app.get("/job/")
 async def get_job_page(page: int = 0, limit: int = 10, session: Session = Depends(get_db)) -> Page[schemas.Job]:
     # Checks
-    guards.is_positive_int(page, "page")
     guards.is_in_range_int(limit, 1, 100, "limit")
 
     # Query DB
@@ -47,7 +46,6 @@ async def get_job_page(page: int = 0, limit: int = 10, session: Session = Depend
 
 @app.get("/job/{job_id}/")
 async def get_job(job_id: int, session: Session = Depends(get_db)) -> schemas.Job:
-    guards.is_positive_int(job_id, "job_id")
     db_job = crud.get_job(session, job_id)
 
     if db_job is None:
@@ -58,7 +56,6 @@ async def get_job(job_id: int, session: Session = Depends(get_db)) -> schemas.Jo
 
 @app.post("/job/{job_id}/event/")
 async def create_event(event: schemas.EventCreate, job_id: int, session: Session = Depends(get_db)) -> schemas.Event:
-    guards.is_positive_int(job_id, "job_id")
     db_event = crud.create_event(session, event, job_id)
 
     return convert.event_model_to_schema(db_event)
@@ -66,7 +63,6 @@ async def create_event(event: schemas.EventCreate, job_id: int, session: Session
 
 @app.get("/event/{event_id}/")
 async def get_event(event_id: int, session: Session = Depends(get_db)) -> schemas.Event:
-    guards.is_positive_int(event_id, "event_id")
     db_event = crud.get_event(session, event_id)
 
     return convert.event_model_to_schema(db_event)
@@ -74,7 +70,14 @@ async def get_event(event_id: int, session: Session = Depends(get_db)) -> schema
 
 @app.patch("/event/{event_id}/")
 async def update_event(event: schemas.EventUpdate, event_id: int, session: Session = Depends(get_db)) -> schemas.Event:
-    guards.is_positive_int(event_id, "event_id")
     db_event = crud.update_event(session, event_id, event)
 
     return convert.event_model_to_schema(db_event)
+
+
+@app.delete("/event/{event_id}/")
+async def delete_event(event_id: int, session: Session = Depends(get_db)) -> bool:
+
+    success = crud.delete_event(session, event_id)
+
+    return success

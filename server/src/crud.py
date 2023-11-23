@@ -75,4 +75,14 @@ def update_event(session: Session, event_id: int, event: schemas.EventUpdate) ->
     session.refresh(db_event)
     return db_event
 
+
+def delete_event(session: Session, event_id: int) -> bool:
+    db_event = session.query(models.Event).get(event_id)
+    if db_event is None:
+        return False
+    session.delete(db_event)
+    session.commit()
+    return True
+
+
 # ======================================================================================================================
