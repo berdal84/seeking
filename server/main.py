@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from starlette import status
 from src.database import SessionLocal, engine
 from src import models, schemas, crud, guards, convert
+from src.exceptions import EventNotFoundException, JobNotFoundException
 from src.schemas import Page
 
 models.Base.metadata.create_all(bind=engine)
@@ -49,7 +50,7 @@ async def get_job(job_id: int, session: Session = Depends(get_db)) -> schemas.Jo
     db_job = crud.get_job(session, job_id)
 
     if db_job is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        raise JobNotFoundException()
 
     return convert.job_model_to_schema(db_job)
 
@@ -61,9 +62,13 @@ async def create_event(event: schemas.EventCreate, job_id: int, session: Session
     return convert.event_model_to_schema(db_event)
 
 
+
 @app.get("/event/{event_id}/")
 async def get_event(event_id: int, session: Session = Depends(get_db)) -> schemas.Event:
     db_event = crud.get_event(session, event_id)
+
+    if db_event is None:
+        raise EventNotFoundException()
 
     return convert.event_model_to_schema(db_event)
 
@@ -72,12 +77,18 @@ async def get_event(event_id: int, session: Session = Depends(get_db)) -> schema
 async def update_event(event: schemas.EventUpdate, event_id: int, session: Session = Depends(get_db)) -> schemas.Event:
     db_event = crud.update_event(session, event_id, event)
 
+    if db_event is None:
+        raise EventNotFoundException()
+
     return convert.event_model_to_schema(db_event)
 
 
 @app.delete("/event/{event_id}/")
-async def delete_event(event_id: int, session: Session = Depends(get_db)) -> bool:
+async def delete_event(event_id: int, session: Session = Depends(get_db)) -> str:
 
     success = crud.delete_event(session, event_id)
 
-    return success
+    if not success:
+        raise EventNotFoundException()
+
+    return "Event deleted"

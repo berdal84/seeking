@@ -59,8 +59,11 @@ def get_event_count(session: Session) -> int:
     return session.query(models.Event).count()
 
 
-def update_event(session: Session, event_id: int, event: schemas.EventUpdate) -> models.Event:
-    db_event: models.Event = session.query(models.Event).get(event_id)
+def update_event(session: Session, event_id: int, event: schemas.EventUpdate) -> models.Event | None:
+    db_event: models.Event | None = session.query(models.Event).get(event_id)
+
+    if db_event is None:
+        return None
 
     if event.type is not None:
         db_event.type = event.type
