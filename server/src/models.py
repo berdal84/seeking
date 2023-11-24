@@ -1,5 +1,5 @@
 import datetime
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Date, Enum
+from sqlalchemy import Column, ForeignKey, Integer, String, Date, Enum
 from sqlalchemy.orm import relationship
 from src.database import Base
 from src.schemas.event import EventType
