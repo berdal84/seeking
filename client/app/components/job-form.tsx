@@ -28,9 +28,7 @@ export default function JobForm({ onSubmit }: Props) {
     handleReset,
     handleBlur,
     touched,
-    isValid,
-    setSubmitting,
-    isSubmitting,
+    submitForm,
   } = useFormik<schemas.JobCreate>({
     initialValues: {
       notes: "",
@@ -124,7 +122,7 @@ export default function JobForm({ onSubmit }: Props) {
       />
 
       <Button variant="outlined" onClick={handleReset}>Reset</Button>
-      <Button variant="outlined" onClick={handleSubmit}>Create</Button>
+      <Button variant="outlined" onClick={submitForm}>Create</Button>
 
       {/*JSON.stringify(touched)*/}
       {/*JSON.stringify(errors)*/}
