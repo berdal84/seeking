@@ -1,8 +1,9 @@
 "use client"
 import {useCallback, useState} from "react";
 import {schemas} from "@/app/typings/schemas";
-import {TextField} from "@mui/material";
-import {Button} from "@mui/base";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
 import {useFormik} from "formik";
 import * as yup from 'yup'
 
@@ -121,9 +122,10 @@ export default function JobForm({ onSubmit }: Props) {
         fullWidth
       />
 
-      <Button variant="outlined" onClick={handleReset}>Reset</Button>
-      <Button variant="outlined" onClick={submitForm}>Create</Button>
-
+      <Box>
+        <Button variant="outlined" onClick={handleReset}>Reset</Button>
+        <Button variant="outlined" onClick={submitForm}>Create</Button>
+      </Box>
       {/*JSON.stringify(touched)*/}
       {/*JSON.stringify(errors)*/}
     </form>

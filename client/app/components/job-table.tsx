@@ -2,44 +2,54 @@
 
 import useJobs from "@/app/hooks/useJobs";
 import {Spinner} from "@/app/components/spinner";
-import {Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TableRow} from "@mui/material";
+import {
+  Box,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableFooter,
+  TableHead,
+  TableRow,
+  Button,
+  TablePagination
+} from "@mui/material";
 import {schemas} from "@/app/typings/schemas";
-import {Button, TablePagination} from "@mui/base";
 import {ChangeEventHandler, MouseEvent, useState} from "react";
-import {Box} from "@mui/system";
 
 export default function JobTable() {
 
   const [{limit, offset}, setState] = useState({offset: 0, limit: 10})
   const page = Math.ceil(offset / limit) // zero-based page index
-  const { data, isLoading, mutate } = useJobs({limit, offset})
+  const {data, isLoading, mutate} = useJobs({limit, offset})
 
-  if ( isLoading || !data) {
+  if (isLoading || !data) {
     return <Spinner/>
   }
 
-  function handleChangePage( event: MouseEvent<HTMLButtonElement> | null, newPage: number) {
-    if ( newPage < 0 ) {
+  function handleChangePage(event: MouseEvent<HTMLButtonElement> | null, newPage: number) {
+    if (newPage < 0) {
       return
     }
     console.log('handleChangePage', newPage)
-    setState(curr => ({...curr, offset: newPage * curr.limit  }))
+    setState(curr => ({...curr, offset: newPage * curr.limit}))
   }
 
   const handleChangeRowsPerPage: ChangeEventHandler<HTMLInputElement> = (event): void => {
     const limit = Number(event.target.value)
     console.log('handleChangeRowsPerPage', limit)
-    setState(curr => ({...curr, limit }))
+    setState(curr => ({...curr, limit}))
   }
 
   async function handleRefresh() {
     return await mutate()
   }
 
-  return <Box sx={{ width: '100%' }}>
-    <Paper sx={{ width: '100%', mb: 2 }}>
+  return <Box sx={{width: '100%'}}>
+    <Paper sx={{width: '100%', mb: 2}}>
       <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+        <Table sx={{minWidth: 650}} size="small" aria-label="a dense table">
           <TableHead>
             <TableRow>
               <TableCell>Role</TableCell>
@@ -50,8 +60,7 @@ export default function JobTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.item.map((job: schemas.Job) => (
-              <TableRow
+            {data.item.map((job: schemas.Job) => (<TableRow
                 key={job.id}
               >
                 <TableCell component="th" scope="row">
@@ -61,11 +70,13 @@ export default function JobTable() {
                 <TableCell align="right">{job.url}</TableCell>
                 <TableCell align="right">{job.notes}</TableCell>
                 <TableCell align="right">{job.events.length} event(s)</TableCell>
-              </TableRow>
-            ))}
+              </TableRow>))}
           </TableBody>
           <TableFooter>
             <TableRow>
+              <TableCell>
+                <Button variant="outlined" onClick={handleRefresh}>Refresh</Button>
+              </TableCell>
               <TablePagination
                 colSpan={5}
                 rowsPerPageOptions={[1, 2, 5, 10, 25, 50]}
@@ -75,9 +86,6 @@ export default function JobTable() {
                 onPageChange={handleChangePage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
               />
-              <TableCell>
-                <Button onClick={handleRefresh}>Refresh</Button>
-              </TableCell>
             </TableRow>
           </TableFooter>
         </Table>

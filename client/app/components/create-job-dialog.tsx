@@ -1,24 +1,17 @@
 import {schemas} from "@/app/typings/schemas";
-import {Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, IconButton} from "@mui/material";
 import JobForm from "@/app/components/job-form";
 import api from "@/app/utilities/api";
 import {CloseIcon} from "next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon";
-import {Button} from "@mui/base";
-import {styled} from "@mui/system";
+import DialogTitle from "@mui/material/DialogTitle";
+import IconButton from "@mui/material/IconButton";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import Dialog from "@mui/material/Dialog";
 
 export interface CreateJobProps {
   open: boolean;
   onClose: (data: schemas.JobCreate | null) => Promise<void>
 }
-
-const MyDialog = styled(Dialog)(({ theme }) => ({
-  '& .MuiDialogContent-root': {
-    padding: theme.spacing(2),
-  },
-  '& .MuiDialogActions-root': {
-    padding: theme.spacing(1),
-  },
-}));
 
 export default function CreateJobDialog(props: CreateJobProps) {
   const { onClose, open } = props;
@@ -33,7 +26,7 @@ export default function CreateJobDialog(props: CreateJobProps) {
   }
 
   return (
-    <MyDialog onClose={handleClose} open={open}>
+    <Dialog onClose={handleClose} open={open}>
       <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
         Create Job
       </DialogTitle>
@@ -55,6 +48,6 @@ export default function CreateJobDialog(props: CreateJobProps) {
         </DialogContentText>
         <JobForm onSubmit={handleSubmit}/>
       </DialogContent>
-    </MyDialog>
+    </Dialog>
   );
 }
