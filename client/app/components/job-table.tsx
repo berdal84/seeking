@@ -1,6 +1,4 @@
 "use client"
-
-import useJobs from "@/app/hooks/useJobs";
 import {Spinner} from "@/app/components/spinner";
 import {
   Box,
@@ -16,15 +14,17 @@ import {
   TablePagination
 } from "@mui/material";
 import {schemas} from "@/app/typings/schemas";
-import {ChangeEventHandler, MouseEvent, useState} from "react";
+import {ChangeEventHandler, MouseEvent} from "react";
+import {useAppDispatch, useAppSelector} from "@/app/redux/hooks";
+import {addPage, loading} from "@/app/redux/jobSlice";
+import {SeekingAPI} from "@/app/utilities/seeking-api";
 
 export default function JobTable() {
-
-  const [{limit, offset}, setState] = useState({offset: 0, limit: 10})
+  const { items, isLoading, item_total_count, limit, offset } = useAppSelector(state => state.job)
+  const dispatch = useAppDispatch()
   const page = Math.ceil(offset / limit) // zero-based page index
-  const {data, isLoading, mutate} = useJobs({limit, offset})
 
-  if (isLoading || !data) {
+  if (isLoading || !items) {
     return <Spinner/>
   }
 
@@ -32,18 +32,28 @@ export default function JobTable() {
     if (newPage < 0) {
       return
     }
-    console.log('handleChangePage', newPage)
-    setState(curr => ({...curr, offset: newPage * curr.limit}))
+
+    // TODO: use middle ware to handle Promises
+
+    dispatch(loading({ isLoading: true}))
+    SeekingAPI.getJobPage(newPage * limit, limit)
+      .then( page => {
+        dispatch(addPage(page))
+        dispatch(loading({ isLoading: false}))
+      })
   }
 
   const handleChangeRowsPerPage: ChangeEventHandler<HTMLInputElement> = (event): void => {
-    const limit = Number(event.target.value)
-    console.log('handleChangeRowsPerPage', limit)
-    setState(curr => ({...curr, limit}))
-  }
+    const newLimit = Number(event.target.value)
 
-  async function handleRefresh() {
-    return await mutate()
+    // TODO: use middle ware to handle Promises
+
+    dispatch(loading({ isLoading: true}))
+    SeekingAPI.getJobPage(offset, newLimit)
+      .then( page => {
+        dispatch(addPage(page))
+        dispatch(loading({ isLoading: false}))
+      })
   }
 
   return <Box sx={{width: '100%'}}>
@@ -60,7 +70,7 @@ export default function JobTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.item.map((job: schemas.Job) => (<TableRow
+            {items.map((job: schemas.Job) => (<TableRow
                 key={job.id}
               >
                 <TableCell component="th" scope="row">
@@ -74,13 +84,10 @@ export default function JobTable() {
           </TableBody>
           <TableFooter>
             <TableRow>
-              <TableCell>
-                <Button variant="outlined" onClick={handleRefresh}>Refresh</Button>
-              </TableCell>
               <TablePagination
                 colSpan={5}
                 rowsPerPageOptions={[1, 2, 5, 10, 25, 50]}
-                count={data.item_total_count}
+                count={item_total_count}
                 rowsPerPage={limit}
                 page={page}
                 onPageChange={handleChangePage}

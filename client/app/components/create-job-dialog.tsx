@@ -1,6 +1,6 @@
 import {schemas} from "@/app/typings/schemas";
 import JobForm from "@/app/components/job-form";
-import api from "@/app/utilities/api";
+import {SeekingAPI} from "@/app/utilities/seeking-api";
 import {CloseIcon} from "next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon";
 import DialogTitle from "@mui/material/DialogTitle";
 import IconButton from "@mui/material/IconButton";
@@ -21,7 +21,7 @@ export default function CreateJobDialog(props: CreateJobProps) {
   }
 
   async function handleSubmit(formData: schemas.JobCreate) {
-    const newJob = await api.createJob(formData)
+    const newJob = await SeekingAPI.createJob(formData)
     await onClose(newJob)
   }
 
