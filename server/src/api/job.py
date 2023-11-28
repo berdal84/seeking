@@ -16,20 +16,18 @@ async def create_job(job: schemas.JobCreate, session: Session = Depends(get_db))
 
 
 @router.get("/job/")
-async def get_job_page(page: int = 0, limit: int = 10, session: Session = Depends(get_db)) -> Page[schemas.Job]:
+async def get_job_page(offset: int = 0, limit: int = 10, session: Session = Depends(get_db)) -> Page[schemas.Job]:
 
     # Checks
     guards.is_in_range_int(limit, 1, 100, "limit")
 
     # Query DB
-    db_jobs = crud.job.get_page(session, skip=page * limit, limit=limit)
+    db_jobs = crud.job.get_page(session, skip=offset, limit=limit)
     item_total_count = crud.job.count(session)  # TODO: get this in single request?
 
     # Prepare response
-    response = Page[schemas.Job](page_index=page,
-                                 item=[],
-                                 item_total_count=item_total_count
-                                 )
+    response = Page[schemas.Job](item=[],
+                                 item_total_count=item_total_count)
     for each_db_job in db_jobs:
         response.item.append(convert.job_model_to_schema(each_db_job))
 
