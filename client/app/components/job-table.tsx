@@ -10,27 +10,30 @@ import {Box} from "@mui/system";
 
 export default function JobTable() {
 
-  // todo: move this to a React.Context or Redux
-  const [ state, setState] = useState({page: 0, limit: 1})
-  const { data, isLoading, mutate } = useJobs(state)
+  const [{limit, offset}, setState] = useState({offset: 0, limit: 10})
+  const page = Math.ceil(offset / limit) // zero-based page index
+  const { data, isLoading, mutate } = useJobs({limit, offset})
 
   if ( isLoading || !data) {
     return <Spinner/>
   }
 
-  function handleChangePage( event: MouseEvent<HTMLButtonElement> | null, page: number) {
-    console.log('handleChangePage', page)
-    setState({...state, page })
+  function handleChangePage( event: MouseEvent<HTMLButtonElement> | null, newPage: number) {
+    if ( newPage < 0 ) {
+      return
+    }
+    console.log('handleChangePage', newPage)
+    setState(curr => ({...curr, offset: newPage * curr.limit  }))
   }
 
   const handleChangeRowsPerPage: ChangeEventHandler<HTMLInputElement> = (event): void => {
     const limit = Number(event.target.value)
     console.log('handleChangeRowsPerPage', limit)
-    setState({...state, limit })
+    setState(curr => ({...curr, limit }))
   }
 
-  function handleRefresh() {
-    mutate()
+  async function handleRefresh() {
+    return await mutate()
   }
 
   return <Box sx={{ width: '100%' }}>
@@ -65,17 +68,17 @@ export default function JobTable() {
             <TableRow>
               <TablePagination
                 colSpan={5}
-                rowsPerPageOptions={[1, 5, 10, 25]}
+                rowsPerPageOptions={[1, 2, 5, 10, 25, 50]}
                 count={data.item_total_count}
-                rowsPerPage={state.limit}
-                page={state.page}
+                rowsPerPage={limit}
+                page={page}
                 onPageChange={handleChangePage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
               />
+              <TableCell>
+                <Button onClick={handleRefresh}>Refresh</Button>
+              </TableCell>
             </TableRow>
-            <TableCell>
-              <Button onClick={handleRefresh}>Refresh</Button>
-            </TableCell>
           </TableFooter>
         </Table>
       </TableContainer>
