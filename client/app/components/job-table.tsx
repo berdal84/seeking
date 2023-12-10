@@ -12,9 +12,13 @@ import {
   TablePagination
 } from "@mui/material";
 import {schemas} from "@/app/typings/schemas";
-import {ChangeEventHandler, MouseEvent, MouseEventHandler} from "react";
+import {ChangeEventHandler, MouseEvent} from "react";
 import {useAppDispatch, useAppSelector} from "@/app/redux/hooks";
 import {fetchPage, jobList, selectJob} from "@/app/redux/jobListSlice";
+
+function formatEvents(events: schemas.Job['events']) {
+  return events.length !== 0 ? `${events.length} event(s)` : 'None';
+}
 
 export default function JobTable() {
   const { status, error, details, page, items, offset, limit, item_total_count } = useAppSelector(jobList)
@@ -63,7 +67,7 @@ export default function JobTable() {
               <TableCell>{job.id}</TableCell>
               <TableCell>{job.role}</TableCell>
               <TableCell>{job.company}</TableCell>
-              <TableCell>{job.events.length} event(s)</TableCell>
+              <TableCell>{formatEvents(job.events)}</TableCell>
             </TableRow>))}
         </TableBody>
         <TableFooter>
