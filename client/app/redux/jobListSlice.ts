@@ -25,9 +25,9 @@ const initialState: State<JobListState> = {
   error: null,
 }
 
-type FetchPageAction = {offset: number, limit: number, concat?: boolean}
+type FetchPagePayload = {offset: number, limit: number, concat?: boolean}
 
-export const fetchPage = createAsyncThunk<schemas.JobPage,FetchPageAction>(
+export const fetchPage = createAsyncThunk<schemas.JobPage,FetchPagePayload>(
   'jobList/fetchPage',
   async ({offset, limit}) => {
   return await SeekingAPI.getJobPage(offset, limit)
@@ -44,24 +44,32 @@ export const jobListSlice = createSlice({
   extraReducers: builder => {
     builder
       .addCase(fetchPage.pending, (state, action) => {
-        state.status = 'pending'
-        state.error = null
+        return {
+          ...state,
+          status: 'pending',
+          error: null
+        }
       })
       .addCase(fetchPage.fulfilled, (state, action) => {
         const {payload, meta: { arg }} = action;
-        state.items = arg.concat ? state.items.concat(payload.item) : payload.item;
-        state.offset = arg.offset;
-        state.limit = arg.limit;
-        state.item_total_count = payload.item_total_count;
-        state.page = Math.ceil(arg.offset / arg.limit);
-        state.status = 'fulfilled'
-        state.error = null;
+        return {
+          ...state,
+          items: arg.concat ? state.items.concat(payload.item) : payload.item,
+          offset: arg.offset,
+          limit: arg.limit,
+          item_total_count: payload.item_total_count,
+          page: Math.ceil(arg.offset / arg.limit),
+          status: 'fulfilled',
+          error: null,
+        }
       })
       .addCase(fetchPage.rejected, (state, action) => {
-
-        state.error = `Unable to fetch job page!`
-        state.details = JSON.stringify(action)
-        state.status = 'error'
+        return {
+          ...state,
+          error: `Unable to fetch page!`,
+          details: JSON.stringify(action),
+          status: 'error',
+        }
       })
   }
 })
