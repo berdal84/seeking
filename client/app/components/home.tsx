@@ -1,63 +1,31 @@
 "use client"
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {Box, Button, Container, createTheme} from "@mui/material";
 import {schemas} from "@/app/typings/schemas";
 import SearchAppBar from "@/app/components/app-bar";
 import JobTable from "@/app/components/job-table";
 import CreateJobDialog from "@/app/components/create-job-dialog";
-import {useAppDispatch} from "@/app/redux/hooks";
-import {addPage, clearCache, loading} from "@/app/redux/jobSlice";
-import {SeekingAPI} from "@/app/utilities/seeking-api";
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#309fbe',
-    },
-    secondary: {
-      main: '#b972ff',
-    },
-    text: {
-      primary: '#222b3d'
-    }
-  }
-});
+import {useAppDispatch, useAppSelector} from "@/app/redux/hooks";
+import {fetchPage, job} from "@/app/redux/jobSlice";
 
 export default function Home() {
   const [open, setOpen] = useState(false);
+  const {offset, limit} = useAppSelector(job)
   const dispatch = useAppDispatch()
   const handleClickOpen = () => {
     setOpen(true);
   };
   const handleClose = async (newJob: schemas.JobCreate | null) => {
     setOpen(false);
+    refreshPage()
   };
-  function handleRefresh() {
-
-    // TODO: use middle ware to handle Promises
-
-    dispatch(clearCache())
-    dispatch(loading({ isLoading: true}))
-    SeekingAPI.getJobPage(0, 10)
-      .then( page => {
-        dispatch(addPage(page))
-        dispatch(loading({ isLoading: false}))
-      })
-  }
+  const refreshPage = useCallback( () => {
+    dispatch(fetchPage({offset, limit, clearCache: true}))
+  }, [dispatch, offset, limit])
 
   useEffect(() => {
-
-    // TODO: use middle ware to handle Promises
-
-    dispatch(loading({ isLoading: true}))
-    SeekingAPI
-      .getJobPage(0, 10)
-      .then( page => {
-        dispatch(addPage(page))
-        dispatch(loading({ isLoading: false}))
-      })
-
-  }, []);
+    refreshPage()
+  }, [refreshPage]);
 
   return (
     <Container sx={{width: '100%', mb: 2}} fixed={true}>
@@ -65,7 +33,7 @@ export default function Home() {
       <h3>Job List</h3>
       <Box sx={{mb: 2}}>
         <Button variant="outlined" onClick={handleClickOpen}>New Job</Button>
-        <Button variant="outlined" onClick={handleRefresh}>Refresh</Button>
+        <Button variant="outlined" onClick={refreshPage}>Refresh</Button>
       </Box>
       <JobTable/>
       <CreateJobDialog open={open} onClose={handleClose} />

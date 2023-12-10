@@ -1,7 +1,6 @@
 
 export namespace schemas {
   export type Page<T> = {
-    page_index: number,
     item: Array<T>,
     item_total_count: number
   }
@@ -27,6 +26,6 @@ export namespace schemas {
 
   export function isJobCreate(data: unknown): data is JobCreate {
     // TODO: use FastAPIs schemas (see OpenAI specs)
-    return 'role' in data && 'company' in data;
+    return typeof data === 'object' && data !== null && 'role' in data && 'company' in data;
   }
 }

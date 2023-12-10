@@ -16,44 +16,27 @@ import {
 import {schemas} from "@/app/typings/schemas";
 import {ChangeEventHandler, MouseEvent} from "react";
 import {useAppDispatch, useAppSelector} from "@/app/redux/hooks";
-import {addPage, loading} from "@/app/redux/jobSlice";
-import {SeekingAPI} from "@/app/utilities/seeking-api";
+import {fetchPage, job, resetState} from "@/app/redux/jobSlice";
 
 export default function JobTable() {
-  const { items, isLoading, item_total_count, limit, offset } = useAppSelector(state => state.job)
+  const { items, isLoading, item_total_count, limit, offset } = useAppSelector(job)
   const dispatch = useAppDispatch()
   const page = Math.ceil(offset / limit) // zero-based page index
 
-  if (isLoading || !items) {
-    return <Spinner/>
-  }
-
   function handleChangePage(event: MouseEvent<HTMLButtonElement> | null, newPage: number) {
     if (newPage < 0) {
-      return
+      throw new Error(`newPage should be a positive integer (actual ${newPage})`)
     }
-
-    // TODO: use middle ware to handle Promises
-
-    dispatch(loading({ isLoading: true}))
-    SeekingAPI.getJobPage(newPage * limit, limit)
-      .then( page => {
-        dispatch(addPage(page))
-        dispatch(loading({ isLoading: false}))
-      })
+    dispatch(fetchPage({ offset: newPage * limit, limit, clearCache: true}))
   }
 
   const handleChangeRowsPerPage: ChangeEventHandler<HTMLInputElement> = (event): void => {
     const newLimit = Number(event.target.value)
+    dispatch(fetchPage({ offset, limit: newLimit, clearCache: true}))
+  }
 
-    // TODO: use middle ware to handle Promises
-
-    dispatch(loading({ isLoading: true}))
-    SeekingAPI.getJobPage(offset, newLimit)
-      .then( page => {
-        dispatch(addPage(page))
-        dispatch(loading({ isLoading: false}))
-      })
+  if (isLoading || !items) {
+    return <Spinner/>
   }
 
   return <Box sx={{width: '100%'}}>
@@ -62,7 +45,8 @@ export default function JobTable() {
         <Table sx={{minWidth: 650}} size="small" aria-label="a dense table">
           <TableHead>
             <TableRow>
-              <TableCell>Role</TableCell>
+              <TableCell>Id</TableCell>
+              <TableCell align="right">Role</TableCell>
               <TableCell align="right">Company</TableCell>
               <TableCell align="right">URL</TableCell>
               <TableCell align="right">Notes</TableCell>
@@ -73,6 +57,9 @@ export default function JobTable() {
             {items.map((job: schemas.Job) => (<TableRow
                 key={job.id}
               >
+                <TableCell component="th" scope="row">
+                  {job.id}
+                </TableCell>
                 <TableCell component="th" scope="row">
                   {job.role}
                 </TableCell>
