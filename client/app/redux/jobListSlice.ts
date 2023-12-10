@@ -3,11 +3,13 @@ import type { RootState } from './store'
 import {schemas} from "@/app/typings/schemas";
 import {SeekingAPI} from "@/app/utilities/seeking-api";
 import {State} from "@/app/typings/state";
+import {PayloadAction} from "@reduxjs/toolkit/dist/createAction";
 
 export type JobListState = {
   items: Array<schemas.Job>;
   item_total_count: number;
   limit: number;
+  selected: schemas.Job | null;
   offset: number;
   page: number;
 }
@@ -18,6 +20,7 @@ const initialState: State<JobListState> = {
   limit: 10,
   offset: 0,
   page: 0,
+  selected: null,
   status: 'idle',
   error: null,
 }
@@ -34,8 +37,8 @@ export const jobListSlice = createSlice({
   name: 'jobList',
   initialState,
   reducers: {
-    resetState: (state) => {
-      state = initialState
+    selectJob: (state,  action: PayloadAction<schemas.Job | null> ) => {
+      state.selected = action.payload;
     }
   },
   extraReducers: builder => {
@@ -63,6 +66,6 @@ export const jobListSlice = createSlice({
   }
 })
 
-export const { resetState } = jobListSlice.actions
+export const { selectJob } = jobListSlice.actions
 export const jobList = (state: RootState) => state.jobList
 export default jobListSlice.reducer
