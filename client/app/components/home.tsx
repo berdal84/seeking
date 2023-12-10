@@ -6,11 +6,11 @@ import SearchAppBar from "@/app/components/app-bar";
 import JobTable from "@/app/components/job-table";
 import CreateJobDialog from "@/app/components/create-job-dialog";
 import {useAppDispatch, useAppSelector} from "@/app/redux/hooks";
-import {fetchPage, job} from "@/app/redux/jobSlice";
+import {fetchPage, jobList} from "@/app/redux/jobListSlice";
 
 export default function Home() {
   const [open, setOpen] = useState(false);
-  const {offset, limit} = useAppSelector(job)
+  const {offset, limit} = useAppSelector(jobList)
   const dispatch = useAppDispatch()
   const handleClickOpen = () => {
     setOpen(true);
@@ -20,7 +20,7 @@ export default function Home() {
     refreshPage()
   };
   const refreshPage = useCallback( () => {
-    dispatch(fetchPage({offset, limit, clearCache: true}))
+    dispatch(fetchPage({offset, limit}))
   }, [dispatch, offset, limit])
 
   useEffect(() => {

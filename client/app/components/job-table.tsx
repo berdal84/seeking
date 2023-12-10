@@ -16,27 +16,30 @@ import {
 import {schemas} from "@/app/typings/schemas";
 import {ChangeEventHandler, MouseEvent} from "react";
 import {useAppDispatch, useAppSelector} from "@/app/redux/hooks";
-import {fetchPage, job, resetState} from "@/app/redux/jobSlice";
+import {fetchPage, jobList} from "@/app/redux/jobListSlice";
 
 export default function JobTable() {
-  const { items, isLoading, item_total_count, limit, offset } = useAppSelector(job)
+  const { status, error, details, page, items, offset, limit, item_total_count } = useAppSelector(jobList)
   const dispatch = useAppDispatch()
-  const page = Math.ceil(offset / limit) // zero-based page index
 
   function handleChangePage(event: MouseEvent<HTMLButtonElement> | null, newPage: number) {
     if (newPage < 0) {
       throw new Error(`newPage should be a positive integer (actual ${newPage})`)
     }
-    dispatch(fetchPage({ offset: newPage * limit, limit, clearCache: true}))
+    dispatch(fetchPage({ offset: newPage * limit, limit}))
   }
 
   const handleChangeRowsPerPage: ChangeEventHandler<HTMLInputElement> = (event): void => {
     const newLimit = Number(event.target.value)
-    dispatch(fetchPage({ offset, limit: newLimit, clearCache: true}))
+    dispatch(fetchPage({ offset, limit: newLimit}))
   }
 
-  if (isLoading || !items) {
-    return <Spinner/>
+  switch (status) {
+    case "error":
+      console.log(details)
+      return <span>{error}</span>
+    case "pending":
+      return <Spinner/>
   }
 
   return <Box sx={{width: '100%'}}>
