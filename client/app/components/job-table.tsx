@@ -40,7 +40,7 @@ export default function JobTable() {
       return <Spinner/>
   }
 
-  const handleJobClick: MouseEventHandler<T> = (job: schemas.Job) => {
+  const handleJobClick = (job: schemas.Job) => {
     dispatch(selectJob(job))
   }
 
