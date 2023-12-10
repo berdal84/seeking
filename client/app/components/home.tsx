@@ -1,6 +1,6 @@
 "use client"
 import {useCallback, useEffect, useState} from "react";
-import {Box, Button, Container, createTheme} from "@mui/material";
+import {Box, Button, Container} from "@mui/material";
 import {schemas} from "@/app/typings/schemas";
 import SearchAppBar from "@/app/components/app-bar";
 import JobTable from "@/app/components/job-table";
