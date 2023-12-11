@@ -21,11 +21,8 @@ export namespace schemas {
     notes: string
   }
 
+  export type EventCreate = Omit<Event, 'id'>
+  export type EventUpdate = Partial<Omit<Event, 'id'>>
   export type JobPage = Page<Job>
   export type JobCreate = Omit<Job, 'id' | 'events'>
-
-  export function isJobCreate(data: unknown): data is JobCreate {
-    // TODO: use FastAPIs schemas (see OpenAI specs)
-    return typeof data === 'object' && data !== null && 'role' in data && 'company' in data;
-  }
 }

@@ -3,6 +3,8 @@ import {createTheme, ThemeProvider} from "@mui/material";
 import {Provider} from "react-redux";
 import {store} from "./redux/store"
 import Home from "@/app/components/home";
+import {LocalizationProvider} from "@mui/x-date-pickers";
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 const theme = createTheme({
   palette: {
@@ -22,7 +24,9 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <Provider store={store}>
-        <Home/>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <Home/>
+        </LocalizationProvider>
       </Provider>
     </ThemeProvider>
   )

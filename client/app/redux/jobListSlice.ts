@@ -30,7 +30,7 @@ type FetchPagePayload = {offset: number, limit: number, concat?: boolean}
 export const fetchPage = createAsyncThunk<schemas.JobPage,FetchPagePayload>(
   'jobList/fetchPage',
   async ({offset, limit}) => {
-  return await SeekingAPI.getJobPage(offset, limit)
+  return await SeekingAPI.job.getPage(offset, limit)
 })
 
 export const jobListSlice = createSlice({
