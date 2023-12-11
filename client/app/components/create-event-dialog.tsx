@@ -24,6 +24,7 @@ export default function CreateEventDialog(props: CreateEventProps) {
   }
 
   async function handleSubmit(formData: schemas.EventCreate) {
+    // TODO: use Redux
     const newEvent = await SeekingAPI.event.create(job.id, formData)
     await onClose(newEvent)
   }

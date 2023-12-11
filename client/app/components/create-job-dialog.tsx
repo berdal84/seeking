@@ -21,7 +21,8 @@ export default function CreateJobDialog(props: CreateJobProps) {
   }
 
   async function handleSubmit(formData: schemas.JobCreate) {
-    const newJob = await SeekingAPI.createJob(formData)
+    // TODO: use Redux
+    const newJob = await SeekingAPI.job.create(formData)
     await onClose(newJob)
   }
 

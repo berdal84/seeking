@@ -15,10 +15,7 @@ import {schemas} from "@/app/typings/schemas";
 import {ChangeEventHandler, MouseEvent} from "react";
 import {useAppDispatch, useAppSelector} from "@/app/redux/hooks";
 import {fetchPage, jobList, selectJob} from "@/app/redux/jobListSlice";
-
-function formatEvents(events: schemas.Job['events']) {
-  return events.length !== 0 ? `${events.length} event(s)` : 'None';
-}
+import {formatEventCount} from "@/app/utilities/formatting";
 
 export default function JobTable() {
   const { status, error, details, page, items, offset, limit, item_total_count } = useAppSelector(jobList)
@@ -67,7 +64,7 @@ export default function JobTable() {
               <TableCell>{job.id}</TableCell>
               <TableCell>{job.role}</TableCell>
               <TableCell>{job.company}</TableCell>
-              <TableCell>{formatEvents(job.events)}</TableCell>
+              <TableCell>{formatEventCount(job.events)}</TableCell>
             </TableRow>))}
         </TableBody>
         <TableFooter>
